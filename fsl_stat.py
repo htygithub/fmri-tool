@@ -30,8 +30,8 @@ if args.allnii:
     list_experim = glob(join(args.exp_dir,'*.nii'))
     list_experim.extend(glob(join(args.exp_dir,'*.nii.gz')))
 else:
-    list_control = iglob(join(args.control_dir,'**',Name_Rmapfile))
-    list_experim = iglob(join(args.exp_dir,'**',Name_Rmapfile))
+    list_control = [f for f in iglob(join(args.control_dir,'**',Name_Rmapfile))]
+    list_experim = [f for f in iglob(join(args.exp_dir,'**',Name_Rmapfile))]
 
 # 列出control內所有的影像路徑
 if len(list_control) > 0:
