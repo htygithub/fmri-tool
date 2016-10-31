@@ -46,7 +46,7 @@ if len(list_control) > 0:
     str_OSins='fslmerge -t '+ Path_current + '/contRmaps '+ str_control
     os.system(str_OSins)
     # 做出control的One sample t-test結果
-    str_OSins='randomise -i %s/contRmaps -o %s/contTwottst -1  -n %d --T2'%(Path_current ,Path_current ,N_iter)
+    str_OSins='randomise -i %s/contRmaps -o %s/contOnettst -1  -n %d --T2'%(Path_current ,Path_current ,N_iter)
     os.system(str_OSins)
 
 
@@ -57,7 +57,7 @@ if len(list_experim) > 0:
     str_OSins='fslmerge -t '+ Path_current + '/expRmaps '+ str_experim
     os.system(str_OSins)
     # 做出Expriment的One sample t-test結果
-    str_OSins='randomise -i %s/expRmaps  -o %s/contTwottst -1  -n %d --T2'%(Path_current ,Path_current ,N_iter)
+    str_OSins='randomise -i %s/expRmaps  -o %s/expOnettst -1  -n %d --T2'%(Path_current ,Path_current ,N_iter)
     os.system(str_OSins)
 
 
