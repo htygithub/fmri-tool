@@ -18,8 +18,8 @@ parser.add_argument("-a", dest="allnii", help="Get all nii files",action='store_
 args = parser.parse_args()
 
 print(args.N_iter)
-Path_current='/home/tyhuang/FACEmars'
-#current_path = os.getcwd()
+#Path_current='/home/tyhuang/FACEmars'
+current_path = os.getcwd()
 N_iter=args.N_iter
 Name_Rmapfile='Rmap_beswarrest.nii'
 
@@ -42,7 +42,7 @@ if len(list_control) > 0:
     # 做出control的One sample t-test結果
     str_OSins='randomise -i %s/contRmaps -o %s/contTwottst -1  -n %d --T2'%(Path_current ,Path_current ,N_iter)
     os.system(str_OSins)
-    print(str_OSins)
+
 
 # 列出Expriment內所有的影像路徑
 if len(list_experim) > 0:
@@ -53,7 +53,7 @@ if len(list_experim) > 0:
     # 做出Expriment的One sample t-test結果
     str_OSins='randomise -i %s/expRmaps  -o %s/contTwottst -1  -n %d --T2'%(Path_current ,Path_current ,N_iter)
     os.system(str_OSins)
-    print(list_experim)
+
 
 
 
