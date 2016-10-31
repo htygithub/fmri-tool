@@ -13,15 +13,15 @@ parser = ArgumentParser()
 parser.add_argument("-c", dest="control_dir", help="Path of control data",action='store',default='ctrl')
 parser.add_argument("-e", dest="exp_dir", help="Path of experiement data",action='store',default='exp')
 parser.add_argument("-n", dest="N_iter", help="Number of iteration",action='store',default=100,type=int)
-parser.add_argument("-f", dest="Name_Rmapfile", help="file name of Rmap",action='store',default='Rmap_beswarrest.nii')
-parser.add_argument("-a", dest="allnii", help="Get all nii files",action='store_true')
+parser.add_argument("-f", dest="Name_Rmapfile", help="File name of Rmap",action='store',default='Rmap_beswarrest.nii')
+parser.add_argument("-a", dest="allnii", help="Get all nii files, disregarding -f",action='store_true')
 args = parser.parse_args()
 
 print(args.N_iter)
 #Path_current='/home/tyhuang/FACEmars'
 Path_current = os.getcwd()
 N_iter=args.N_iter
-Name_Rmapfile='Rmap_beswarrest.nii'
+#Name_Rmapfile='Rmap_beswarrest.nii'
 
 if args.allnii:
     # 分別讀取 Path_current下面的cont與exp資料夾內的MARS結果資料夾，直接從各資料夾中讀取名稱為 Name_Rmapfile(Rmap_beswarrest.nii)的檔案
@@ -30,8 +30,8 @@ if args.allnii:
     list_experim = glob(join(args.exp_dir,'*.nii'))
     list_experim.extend(glob(join(args.exp_dir,'*.nii.gz')))
 else:
-    list_control = [f for f in iglob(join(args.control_dir,'**',Name_Rmapfile))]
-    list_experim = [f for f in iglob(join(args.exp_dir,'**',Name_Rmapfile))]
+    list_control = [f for f in iglob(join(args.control_dir,'**',Name_Rmapfile),recursive=True)]
+    list_experim = [f for f in iglob(join(args.exp_dir,'**',Name_Rmapfile),recursive=True)]
 
 # 列出control內所有的影像路徑
 if len(list_control) > 0:
