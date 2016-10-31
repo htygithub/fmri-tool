@@ -1,7 +1,7 @@
 # coding: utf-8
 import sys
 import os
-from glob import glob
+from glob import glob,iglob
 from os.path import join
 from argparse import ArgumentParser
 #Path_current=sys.argv[0]
@@ -13,6 +13,8 @@ parser = ArgumentParser()
 parser.add_argument("-c", dest="control_dir", help="Path of control data",action='store',default='ctrl')
 parser.add_argument("-e", dest="exp_dir", help="Path of experiement data",action='store',default='exp')
 parser.add_argument("-n", dest="N_iter", help="Number of iteration",action='store',default=100,type=int)
+parser.add_argument("-f", dest="Name_Rmapfile", help="file name of Rmap",action='store',default='Rmap_beswarrest.nii')
+parser.add_argument("-a", dest="allnii", help="Get all nii files",action='store_true')
 args = parser.parse_args()
 
 print(args.N_iter)
@@ -21,11 +23,15 @@ Path_current='/home/tyhuang/FACEmars'
 N_iter=args.N_iter
 Name_Rmapfile='Rmap_beswarrest.nii'
 
-# 分別讀取 Path_current下面的cont與exp資料夾內的MARS結果資料夾，直接從各資料夾中讀取名稱為 Name_Rmapfile(Rmap_beswarrest.nii)的檔案
-list_control = glob(join(args.control_dir,'*.nii'))
-list_control.extend(glob(join(args.control_dir,'*.nii.gz')))
-list_experim = glob(join(args.exp_dir,'*.nii'))
-list_experim.extend(glob(join(args.exp_dir,'*.nii.gz')))
+if args.allnii:
+    # 分別讀取 Path_current下面的cont與exp資料夾內的MARS結果資料夾，直接從各資料夾中讀取名稱為 Name_Rmapfile(Rmap_beswarrest.nii)的檔案
+    list_control = glob(join(args.control_dir,'*.nii'))
+    list_control.extend(glob(join(args.control_dir,'*.nii.gz')))
+    list_experim = glob(join(args.exp_dir,'*.nii'))
+    list_experim.extend(glob(join(args.exp_dir,'*.nii.gz')))
+else:
+    list_control = iglob(join(args.control_dir,'**',Name_Rmapfile))
+    list_experim = iglob(join(args.exp_dir,'**',Name_Rmapfile))
 
 # 列出control內所有的影像路徑
 if len(list_control) > 0:
@@ -47,7 +53,6 @@ if len(list_experim) > 0:
     # 做出Expriment的One sample t-test結果
     str_OSins='randomise -i %s/expRmaps  -o %s/contTwottst -1  -n %d --T2'%(Path_current ,Path_current ,N_iter)
     os.system(str_OSins)
-    twosample = True
     print(list_experim)
 
 
@@ -55,7 +60,7 @@ if len(list_experim) > 0:
 
 
 
-if twosample:
+if len(list_experim) > 0:
     # 把兩個群組的Rmaps合併成一個，並且由design.mat決定群組
     str_OSins='fslmerge -t allRmaps '+ Path_current + '/contRmaps ' + Path_current + '/expRmaps '
     os.system(str_OSins)
