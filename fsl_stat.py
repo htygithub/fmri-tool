@@ -19,7 +19,7 @@ args = parser.parse_args()
 
 print(args.N_iter)
 #Path_current='/home/tyhuang/FACEmars'
-current_path = os.getcwd()
+Path_current = os.getcwd()
 N_iter=args.N_iter
 Name_Rmapfile='Rmap_beswarrest.nii'
 
