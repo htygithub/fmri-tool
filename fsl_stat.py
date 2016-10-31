@@ -30,8 +30,8 @@ if args.allnii:
     list_experim = glob(join(args.exp_dir,'*.nii'))
     list_experim.extend(glob(join(args.exp_dir,'*.nii.gz')))
 else:
-    list_control = [f for f in iglob(join(args.control_dir,'**',Name_Rmapfile),recursive=True)]
-    list_experim = [f for f in iglob(join(args.exp_dir,'**',Name_Rmapfile),recursive=True)]
+    list_control = [f for f in iglob(join(args.control_dir,'**',args.Name_Rmapfile),recursive=True)]
+    list_experim = [f for f in iglob(join(args.exp_dir,'**',args.Name_Rmapfile),recursive=True)]
 
 
 print('Control datafiles:')
