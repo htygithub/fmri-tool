@@ -6,5 +6,5 @@ fmri analysis tools
 (2) Python3.5
 
 ##usage
-(1)python3.5 fsl_stat.py -c [directory of control RMAPS] =e [directory of exp RMAPS]
-
+(1)python3.5 fsl_stat.py -c [directory of control RMAPS] -e [directory of exp RMAPS]
+  ex. python3.5 fsl_stat.py -c cont -e exp
