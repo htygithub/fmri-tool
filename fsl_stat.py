@@ -35,9 +35,9 @@ else:
 
 
 print('Control datafiles:')
-for ii in range(len(list_control)):print('%d:%s' % (ii,list_control[ii])
+for ii in range(len(list_control)):print('%d:%s' % (ii,list_control[ii]))
 print('Exp datafiles:')
-for ii in range(len(list_experim)):print('%d:%s' % (ii,list_experim[ii])
+for ii in range(len(list_experim)):print('%d:%s' % (ii,list_experim[ii]))
 
 # 列出control內所有的影像路徑
 if len(list_control) > 0:
