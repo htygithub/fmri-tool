@@ -77,7 +77,7 @@ if len(list_experim) > 0:
 
 if len(list_experim) > 0:
     # 把兩個群組的Rmaps合併成一個，並且由design.mat決定群組
-    str_OSins='fslmerge -t allRmaps '+ result_dir + '/contRmaps ' + result_dir + '/expRmaps '
+    str_OSins='fslmerge -t '+ result_dir + '/allRmaps '+ result_dir + '/contRmaps ' + result_dir + '/expRmaps '
     os.system(str_OSins)
 
     # 若兩組資料只是單純的兩群不同受試者比較Two-Sample Unpaired T-test，而非Two-Sample Paired T-test (Paired Two-Group Difference)
