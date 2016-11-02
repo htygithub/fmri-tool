@@ -10,6 +10,12 @@ import datetime
 #Name_Rmapfile=sys.argv[2]
 # parse input arguments
 
+def safe_mkdir(dirname):
+    try:
+        os.mkdir(dirname)
+    except:
+        pass
+
 parser = ArgumentParser()
 parser.add_argument("-c", dest="control_dir", help="Path of control data",action='store',default='ctrl')
 parser.add_argument("-e", dest="exp_dir", help="Path of experiement data",action='store',default='exp')
@@ -24,7 +30,7 @@ Path_current = os.getcwd()
 N_iter=args.N_iter
 #Name_Rmapfile='Rmap_beswarrest.nii'
 result_dir = join(Path_current,datetime.datetime.now().strftime("stat%m%d%H%M%S"))
-
+safe_mkdir(result_dir)
 if args.allnii:
     # 分別讀取 Path_current下面的cont與exp資料夾內的MARS結果資料夾，直接從各資料夾中讀取名稱為 Name_Rmapfile(Rmap_beswarrest.nii)的檔案
     list_control = glob(join(args.control_dir,'*.nii'))
