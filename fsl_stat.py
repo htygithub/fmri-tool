@@ -22,8 +22,10 @@ parser.add_argument("-e", dest="exp_dir", help="Path of experiement data",action
 parser.add_argument("-n", dest="N_iter", help="Number of iteration",action='store',default=100,type=int)
 parser.add_argument("-f", dest="Name_Rmapfile", help="File name of Rmap, Default: Rmap_beswarrest.nii",action='store',default='Rmap_beswarrest.nii')
 parser.add_argument("-a", dest="allnii", help="Get all nii files, disregarding -f",action='store_true')
+parser.add_argument("-z", dest="zmap", help="Fisher's r-to-z transform",action='store_true')
 args = parser.parse_args()
 
+print(args.zmap)
 print(args.N_iter)
 #Path_current='/home/tyhuang/FACEmars'
 Path_current = os.getcwd()
@@ -57,6 +59,9 @@ design_ff = join(result_dir,'design')
 design_mat_ff = join(result_dir,'design.mat')
 design_con_ff = join(result_dir,'design.con')
 
+str_control = ' '.join(list_control)
+print(str_control)
+exit()
 # 列出control內所有的影像路徑
 if len(list_control) > 0:
     str_control = ' '.join(list_control)
