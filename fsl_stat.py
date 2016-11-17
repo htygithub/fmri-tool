@@ -66,16 +66,16 @@ else:
 
 
 print('Control datafiles:')
-list_control2 = list_control[:]
 for ii in range(len(list_control)):
     print('%d:%s' % (ii,list_control[ii]))
-    list_control2[ii] = r_to_z(list_control[ii])
+    if args.zmap:
+        list_control[ii] = r_to_z(list_control[ii])
 
 print('Exp datafiles:')
-list_experim2 = list_experim[:]
 for ii in range(len(list_experim)):
     print('%d:%s' % (ii,list_experim[ii]))
-    list_experim2[ii] = r_to_z(list_experim[ii])
+    if args.zmap:
+        list_experim[ii] = r_to_z(list_experim[ii])
 
 
 ctrl_rmap_ff = join(result_dir,'ctrlRmaps')
@@ -89,15 +89,15 @@ design_mat_ff = join(result_dir,'design.mat')
 design_con_ff = join(result_dir,'design.con')
 
 '''
-str_control = ' '.join(list_control2)
+str_control = ' '.join(list_control)
 print(str_control)
-str_experim = ' '.join(list_experim2)
+str_experim = ' '.join(list_experim)
 print(str_experim)
 exit()
 '''
 # 列出control內所有的影像路徑
-if len(list_control2) > 0:
-    str_control = ' '.join(list_control2)
+if len(list_control) > 0:
+    str_control = ' '.join(list_control)
     # 把所有control受試者的Rmap合併成一個四維的Rmaps
     str_OSins='fslmerge -t %s %s ' % (ctrl_rmap_ff,str_control)
     systemx(str_OSins)
@@ -107,8 +107,8 @@ if len(list_control2) > 0:
 
 
 # 列出Expriment內所有的影像路徑
-if len(list_experim2) > 0:
-    str_experim = ' '.join(list_experim2)
+if len(list_experim) > 0:
+    str_experim = ' '.join(list_experim)
     # 把所有Expriment受試者的Rmap合併成一個四維的Rmaps
     # str_OSins='fslmerge -t '+ Path_current + '/expRmaps '+ str_experim
     str_OSins='fslmerge -t %s %s ' % (exp_rmap_ff,str_experim)
@@ -118,7 +118,7 @@ if len(list_experim2) > 0:
     systemx(str_OSins)
 
 
-if len(list_experim2) > 0:
+if len(list_experim) > 0:
     # 把兩個群組的Rmaps合併成一個，並且由design.mat決定群組
     str_OSins='fslmerge -t %s %s %s' % (all_rmap_ff,ctrl_rmap_ff,exp_rmap_ff)
     systemx(str_OSins)
@@ -126,7 +126,7 @@ if len(list_experim2) > 0:
     # 若兩組資料只是單純的兩群不同受試者比較Two-Sample Unpaired T-test，而非Two-Sample Paired T-test (Paired Two-Group Difference)
     # 可以用 design_ttest2 檔案名稱 群組A數目 群組B數目 來建立design.mat以及design.con
     # design.mat是GLM用來分辨不同群組的矩陣。design.con是不同群組之間的contrast(譬如說A >B 或A<B)
-    str_OSins='design_ttest2 %s %d %d' % (design_ff, len(list_control2),len(list_experim2))
+    str_OSins='design_ttest2 %s %d %d' % (design_ff, len(list_control),len(list_experim))
     systemx(str_OSins)
 
     # 執行兩群組之間的Two sample t-test
