@@ -141,12 +141,12 @@ else:
     for ii in range(nvols):
         for f in list_control:
             extractedfile = join(dirname(f),'anatemp5566.nii.gz')
-            cmd = 'fslroi %s %s 0 1' % (f, extractedfile)
+            cmd = 'fslroi %s %s %d 1' % (f, extractedfile, ii)
             systemx(cmd)
             list_control_new.append(extractedfile)
         for f in list_experim:
             extractedfile = join(dirname(f),'anatemp5566.nii.gz')
-            cmd = 'fslroi %s %s 0 1' % (f, extractedfile)
+            cmd = 'fslroi %s %s %d 1' % (f, extractedfile, ii)
             systemx(cmd)
             list_experim_new.append(extractedfile)
 
