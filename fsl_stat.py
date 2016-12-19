@@ -45,8 +45,7 @@ parser.add_argument("-a", dest="allnii", help="Get all nii files, disregarding -
 parser.add_argument("-z", dest="zmap", help="Fisher's r-to-z transform",action='store_true')
 args = parser.parse_args()
 
-print(args.zmap)
-print(args.N_iter)
+
 #Path_current='/home/tyhuang/FACEmars'
 Path_current = os.getcwd()
 N_iter=args.N_iter
