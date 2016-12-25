@@ -153,3 +153,6 @@ else:
         result_dir_new = join(result_dir,'rsn%d' % ii)
         safe_mkdir(result_dir_new)
         processfile(list_control_new, list_experim_new, args, result_dir_new)
+systemx('rm %s' % all_rmap_ff)
+systemx('rm %s' % ctrl_rmap_ff)
+systemx('rm %s' % exp_rmap_ff)
