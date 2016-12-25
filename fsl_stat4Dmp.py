@@ -6,6 +6,8 @@ from os.path import join
 from argparse import ArgumentParser
 import datetime
 import subprocess
+import multiprocessing
+
 
 def safe_mkdir(dirname):
     try:
@@ -16,9 +18,7 @@ def safe_mkdir(dirname):
 def safe_remove(ff):
     try:
         os.remove(ff)
-        print('removed: ' + ff)
     except:
-        print('Failed: removing ' + ff)
         pass
 
 def systemx(cmd, display=True):
@@ -72,8 +72,11 @@ def processfile(list_control, list_experim, args, result_dir):
         # 把所有control受試者的Rmap合併成一個四維的Rmaps
         str_OSins='fslmerge -t %s %s ' % (ctrl_rmap_ff,str_control)
         systemx(str_OSins)
+        for f in list_control:
+            safe_remove(f)
+
         # 做出control的One sample t-test結果
-        str_OSins='randomise -i %s -o %s -1  -n %d -x' % (ctrl_rmap_ff, ctrl_1sample_ff, N_iter)
+        str_OSins='randomise -i %s -o %s -1  -n %d -x --quiet' % (ctrl_rmap_ff, ctrl_1sample_ff, N_iter)
         systemx(str_OSins)
 
 
@@ -84,8 +87,10 @@ def processfile(list_control, list_experim, args, result_dir):
         # str_OSins='fslmerge -t '+ Path_current + '/expRmaps '+ str_experim
         str_OSins='fslmerge -t %s %s ' % (exp_rmap_ff,str_experim)
         systemx(str_OSins)
+        for f in list_experim:
+            safe_remove(f)
         # 做出Expriment的One sample t-test結果
-        str_OSins='randomise -i %s -o %s -1  -n %d -x' % (exp_rmap_ff, exp_1sample_ff, N_iter)
+        str_OSins='randomise -i %s -o %s -1  -n %d -x --quiet' % (exp_rmap_ff, exp_1sample_ff, N_iter)
         systemx(str_OSins)
 
 
@@ -102,7 +107,7 @@ def processfile(list_control, list_experim, args, result_dir):
         systemx(str_OSins)
 
         # 執行兩群組之間的Two sample t-test
-        str_OSins='randomise -i %s -o %s -d %s -t %s -x -n %d' % (all_rmap_ff, twosample_ff,design_mat_ff, design_con_ff, N_iter)
+        str_OSins='randomise -i %s -o %s -d %s -t %s -x -n %d --quiet' % (all_rmap_ff, twosample_ff,design_mat_ff, design_con_ff, N_iter)
         systemx(str_OSins)
         safe_remove(ctrl_rmap_ff)
         safe_remove(exp_rmap_ff)
@@ -117,6 +122,7 @@ parser.add_argument("-n", dest="N_iter", help="Number of iteration",action='stor
 parser.add_argument("-f", dest="Name_Rmapfile", help="File name of Rmap, Default: Rmap_beswarrest.nii",action='store',default='Rmap_beswarrest.nii')
 parser.add_argument("-a", dest="allnii", help="Get all nii files, disregarding -f",action='store_true')
 parser.add_argument("-z", dest="zmap", help="Fisher's r-to-z transform",action='store_true')
+parser.add_argument("-mp", dest="mp", help="multiple cpu processing",action='store_true')
 parser.add_argument("-nchc", dest="nchc", help="Run in NCHC",action='store_true')
 args = parser.parse_args()
 
@@ -157,20 +163,26 @@ if nvols == 1:
     exit()
 else:
     for ii in range(nvols):
+
         list_control_new=[]
         list_experim_new=[]
         for kk, f in enumerate(list_control):
-            extractedfile = join(result_dir,'anatemp5566_%d.nii.gz' % kk)
+            extractedfile = join(result_dir,'anatemp5566c__%d_%d.nii.gz' % (ii,kk))
             cmd = 'fslroi %s %s %d 1' % (f, extractedfile, ii)
             systemx(cmd)
             list_control_new.append(extractedfile)
         for kk, f in enumerate(list_experim):
-            extractedfile = join(result_dir,'anatemp5566_%d.nii.gz' % kk)
+            extractedfile = join(result_dir,'anatemp5566e__%d_%d.nii.gz' % (ii,kk))
             cmd = 'fslroi %s %s %d 1' % (f, extractedfile, ii)
             systemx(cmd)
             list_experim_new.append(extractedfile)
 
         result_dir_new = join(result_dir,'rsn%d' % ii)
         safe_mkdir(result_dir_new)
-        processfile(list_control_new, list_experim_new, args, result_dir_new)
-systemx('rm -f %s' % join(result_dir,'anatemp5566_*'))
+        if args.mp:
+            p = multiprocessing.Process(target=processfile, args=(list_control_new, list_experim_new, args, result_dir_new))
+            p.start()
+        else:
+            processfile(list_control_new, list_experim_new, args, result_dir_new)
+
+#systemx('rm -f %s' % join(result_dir,'anatemp5566_*'))
