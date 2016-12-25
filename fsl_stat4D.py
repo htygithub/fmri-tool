@@ -5,6 +5,7 @@ from glob import glob,iglob
 from os.path import join
 from argparse import ArgumentParser
 import datetime
+import subprocess
 
 def safe_mkdir(dirname):
     try:
@@ -12,9 +13,19 @@ def safe_mkdir(dirname):
     except:
         pass
 
-def systemx(cmd):
-    print(cmd)
-    os.system(cmd)
+def safe_remove(ff):
+    try:
+        os.remove(ff)
+        print('removed: ' + ff)
+    except:
+        print('Failed: removing ' + ff)
+        pass
+
+def systemx(cmd, display=True):
+    if display:
+        print(cmd)
+    subprocess.call(cmd, shell=True)
+
 
 def r_to_z(rmap_ff):
     import os
@@ -45,9 +56,9 @@ def processfile(list_control, list_experim, args, result_dir):
             list_experim[ii] = r_to_z(list_experim[ii])
 
 
-    ctrl_rmap_ff = join(result_dir,'ctrlRmaps')
-    exp_rmap_ff = join(result_dir,'expRmaps')
-    all_rmap_ff = join(result_dir,'allRmaps')
+    ctrl_rmap_ff = join(result_dir,'ctrlRmaps.nii.gz')
+    exp_rmap_ff = join(result_dir,'expRmaps.nii.gz')
+    all_rmap_ff = join(result_dir,'allRmaps.nii.gz')
     ctrl_1sample_ff = join(result_dir,'ctrl_1sample')
     exp_1sample_ff = join(result_dir,'exp_1sample')
     twosample_ff = join(result_dir,'twosample')
@@ -62,8 +73,9 @@ def processfile(list_control, list_experim, args, result_dir):
         str_OSins='fslmerge -t %s %s ' % (ctrl_rmap_ff,str_control)
         systemx(str_OSins)
         # 做出control的One sample t-test結果
-        str_OSins='randomise -i %s -o %s -1  -n %d --T2' % (ctrl_rmap_ff, ctrl_1sample_ff, N_iter)
+        str_OSins='randomise -i %s -o %s -1  -n %d -x' % (ctrl_rmap_ff, ctrl_1sample_ff, N_iter)
         systemx(str_OSins)
+
 
     # 列出Expriment內所有的影像路徑
     if len(list_experim) > 0:
@@ -73,11 +85,12 @@ def processfile(list_control, list_experim, args, result_dir):
         str_OSins='fslmerge -t %s %s ' % (exp_rmap_ff,str_experim)
         systemx(str_OSins)
         # 做出Expriment的One sample t-test結果
-        str_OSins='randomise -i %s -o %s -1  -n %d --T2' % (exp_rmap_ff, exp_1sample_ff, N_iter)
+        str_OSins='randomise -i %s -o %s -1  -n %d -x' % (exp_rmap_ff, exp_1sample_ff, N_iter)
         systemx(str_OSins)
 
 
-    if len(list_experim) > 0:
+
+    if len(list_control) > 0 and len(list_experim) > 0:
         # 把兩個群組的Rmaps合併成一個，並且由design.mat決定群組
         str_OSins='fslmerge -t %s %s %s' % (all_rmap_ff,ctrl_rmap_ff,exp_rmap_ff)
         systemx(str_OSins)
@@ -89,8 +102,12 @@ def processfile(list_control, list_experim, args, result_dir):
         systemx(str_OSins)
 
         # 執行兩群組之間的Two sample t-test
-        str_OSins='randomise -i %s -o %s -d %s -t %s --T2 -n %d' % (all_rmap_ff, twosample_ff,design_mat_ff, design_con_ff, N_iter)
+        str_OSins='randomise -i %s -o %s -d %s -t %s -x -n %d' % (all_rmap_ff, twosample_ff,design_mat_ff, design_con_ff, N_iter)
         systemx(str_OSins)
+        safe_remove(ctrl_rmap_ff)
+        safe_remove(exp_rmap_ff)
+        safe_remove(all_rmap_ff)
+
 
 
 parser = ArgumentParser()
@@ -100,6 +117,7 @@ parser.add_argument("-n", dest="N_iter", help="Number of iteration",action='stor
 parser.add_argument("-f", dest="Name_Rmapfile", help="File name of Rmap, Default: Rmap_beswarrest.nii",action='store',default='Rmap_beswarrest.nii')
 parser.add_argument("-a", dest="allnii", help="Get all nii files, disregarding -f",action='store_true')
 parser.add_argument("-z", dest="zmap", help="Fisher's r-to-z transform",action='store_true')
+parser.add_argument("-nchc", dest="nchc", help="Run in NCHC",action='store_true')
 args = parser.parse_args()
 
 #x=int(subprocess.check_output('. /etc/fsl/fsl.sh && fslnvols Rmap_beswarrest.nii',shell=True))
@@ -108,7 +126,7 @@ args = parser.parse_args()
 Path_current = os.getcwd()
 N_iter=args.N_iter
 #Name_Rmapfile='Rmap_beswarrest.nii'
-result_dir = join(Path_current,datetime.datetime.now().strftime("stat%m%d_%H%M%S"))
+result_dir = join(Path_current,datetime.datetime.now().strftime("stat%m%d_%H%M%S")+args.Name_Rmapfile.split('.')[0])
 safe_mkdir(result_dir)
 if args.allnii:
     # 分別讀取 Path_current下面的cont與exp資料夾內的MARS結果資料夾，直接從各資料夾中讀取名稱為 Name_Rmapfile(Rmap_beswarrest.nii)的檔案
@@ -120,9 +138,11 @@ else:
     list_control = [f for f in iglob(join(args.control_dir,'**',args.Name_Rmapfile),recursive=True)]
     list_experim = [f for f in iglob(join(args.exp_dir,'**',args.Name_Rmapfile),recursive=True)]
 
-import subprocess
 
-nvols=int(subprocess.check_output('. /etc/fsl/fsl.sh && fslnvols %s' % list_control[0],shell=True))
+if args.nchc:
+    nvols=int(subprocess.check_output('fslnvols %s' % list_control[0],shell=True))
+else:
+    nvols=int(subprocess.check_output('. /etc/fsl/fsl.sh && fslnvols %s' % list_control[0],shell=True))
 
 print(nvols)
 from os.path import dirname,basename,splitext,join
@@ -139,13 +159,13 @@ else:
     list_control_new=[]
     list_experim_new=[]
     for ii in range(nvols):
-        for f in list_control:
-            extractedfile = join(dirname(f),'anatemp5566.nii.gz')
+        for kk, f in enumerate(list_control):
+            extractedfile = join(result_dir,'anatemp5566_%d.nii.gz' % kk)
             cmd = 'fslroi %s %s %d 1' % (f, extractedfile, ii)
             systemx(cmd)
             list_control_new.append(extractedfile)
-        for f in list_experim:
-            extractedfile = join(dirname(f),'anatemp5566.nii.gz')
+        for kk, f in enumerate(list_control):
+            extractedfile = join(result_dir,'anatemp5566_%d.nii.gz' % kk)
             cmd = 'fslroi %s %s %d 1' % (f, extractedfile, ii)
             systemx(cmd)
             list_experim_new.append(extractedfile)
@@ -153,6 +173,4 @@ else:
         result_dir_new = join(result_dir,'rsn%d' % ii)
         safe_mkdir(result_dir_new)
         processfile(list_control_new, list_experim_new, args, result_dir_new)
-systemx('rm %s' % all_rmap_ff)
-systemx('rm %s' % ctrl_rmap_ff)
-systemx('rm %s' % exp_rmap_ff)
+systemx('rm -f %s' % join(result_dir,'anatemp5566_*'))
