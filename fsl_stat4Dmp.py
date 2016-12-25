@@ -6,7 +6,10 @@ from os.path import join
 from argparse import ArgumentParser
 import datetime
 import subprocess
-import multiprocessing
+import multiprocessing as mp
+import numpy as np
+import math
+import nibabel as nib
 
 
 def safe_mkdir(dirname):
@@ -28,10 +31,6 @@ def systemx(cmd, display=True):
 
 
 def r_to_z(rmap_ff):
-    import os
-    import numpy as np
-    import math
-    import nibabel as nib
     img = nib.load(rmap_ff)
     affine = img.affine
     img_data = img.get_data()
@@ -66,6 +65,11 @@ def processfile(list_control, list_experim, args, result_dir):
     design_mat_ff = join(result_dir,'design.mat')
     design_con_ff = join(result_dir,'design.con')
 
+    if args.tfce:
+        multiple_comp = '-T'
+    else:
+        multiple_comp = '-x'
+
     # 列出control內所有的影像路徑
     if len(list_control) > 0:
         str_control = ' '.join(list_control)
@@ -76,7 +80,8 @@ def processfile(list_control, list_experim, args, result_dir):
             safe_remove(f)
 
         # 做出control的One sample t-test結果
-        str_OSins='randomise -i %s -o %s -1  -n %d -x --quiet' % (ctrl_rmap_ff, ctrl_1sample_ff, N_iter)
+        str_OSins='randomise -i %s -o %s -1  -n %d --quiet %s' % \
+                  (ctrl_rmap_ff, ctrl_1sample_ff, N_iter, multiple_comp)
         systemx(str_OSins)
 
 
@@ -90,7 +95,8 @@ def processfile(list_control, list_experim, args, result_dir):
         for f in list_experim:
             safe_remove(f)
         # 做出Expriment的One sample t-test結果
-        str_OSins='randomise -i %s -o %s -1  -n %d -x --quiet' % (exp_rmap_ff, exp_1sample_ff, N_iter)
+        str_OSins='randomise -i %s -o %s -1  -n %d --quiet %s' % \
+                  (exp_rmap_ff, exp_1sample_ff, N_iter, multiple_comp)
         systemx(str_OSins)
 
 
@@ -103,11 +109,14 @@ def processfile(list_control, list_experim, args, result_dir):
         # 若兩組資料只是單純的兩群不同受試者比較Two-Sample Unpaired T-test，而非Two-Sample Paired T-test (Paired Two-Group Difference)
         # 可以用 design_ttest2 檔案名稱 群組A數目 群組B數目 來建立design.mat以及design.con
         # design.mat是GLM用來分辨不同群組的矩陣。design.con是不同群組之間的contrast(譬如說A >B 或A<B)
-        str_OSins='design_ttest2 %s %d %d' % (design_ff, len(list_control),len(list_experim))
+        str_OSins='design_ttest2 %s %d %d' % (design_ff, len(list_control),
+                                              len(list_experim))
         systemx(str_OSins)
 
         # 執行兩群組之間的Two sample t-test
-        str_OSins='randomise -i %s -o %s -d %s -t %s -x -n %d --quiet' % (all_rmap_ff, twosample_ff,design_mat_ff, design_con_ff, N_iter)
+        str_OSins='randomise -i %s -o %s -d %s -t %s -n %d --quiet %s' % \
+                  (all_rmap_ff, twosample_ff,design_mat_ff,
+                   design_con_ff, N_iter, multiple_comp)
         systemx(str_OSins)
         safe_remove(ctrl_rmap_ff)
         safe_remove(exp_rmap_ff)
@@ -116,14 +125,15 @@ def processfile(list_control, list_experim, args, result_dir):
 
 
 parser = ArgumentParser()
-parser.add_argument("-c", dest="control_dir", help="Path of control data",action='store',default='ctrl')
-parser.add_argument("-e", dest="exp_dir", help="Path of experiement data",action='store',default='exp')
-parser.add_argument("-n", dest="N_iter", help="Number of iteration",action='store',default=100,type=int)
+parser.add_argument("-c", dest="control_dir", help="Path of control data (default: ctrl)",action='store',default='ctrl')
+parser.add_argument("-e", dest="exp_dir", help="Path of experiement data (default: exp)",action='store',default='exp')
+parser.add_argument("-n", dest="N_iter", help="Number of iteration (default: 100)",action='store',default=100,type=int)
 parser.add_argument("-f", dest="Name_Rmapfile", help="File name of Rmap, Default: Rmap_beswarrest.nii",action='store',default='Rmap_beswarrest.nii')
 parser.add_argument("-a", dest="allnii", help="Get all nii files, disregarding -f",action='store_true')
-parser.add_argument("-z", dest="zmap", help="Fisher's r-to-z transform",action='store_true')
-parser.add_argument("-mp", dest="mp", help="multiple cpu processing",action='store_true')
-parser.add_argument("-nchc", dest="nchc", help="Run in NCHC",action='store_true')
+parser.add_argument("-z", dest="zmap", help="Fisher's r-to-z transform (default: none)",action='store_true')
+parser.add_argument("-mp", dest="mp", help="multiple cpu processing (default: none)",action='store_true')
+parser.add_argument("-nchc", dest="nchc", help="Run in NCHC (default: none)",action='store_true')
+parser.add_argument("-tfce", dest="tfce", help="FSL TFCE (default: none)",action='store_true')
 args = parser.parse_args()
 
 #x=int(subprocess.check_output('. /etc/fsl/fsl.sh && fslnvols Rmap_beswarrest.nii',shell=True))
@@ -132,7 +142,8 @@ args = parser.parse_args()
 Path_current = os.getcwd()
 N_iter=args.N_iter
 #Name_Rmapfile='Rmap_beswarrest.nii'
-result_dir = join(Path_current,datetime.datetime.now().strftime("stat%m%d_%H%M%S_")+args.Name_Rmapfile.split('.')[0] + 'N%d' % args.N_iter)
+result_dir = join(Path_current,datetime.datetime.now().strftime("stat%m%d_%H%M%S_") + \
+                  args.Name_Rmapfile.split('.')[0] + 'N%d' % args.N_iter)
 safe_mkdir(result_dir)
 if args.allnii:
     # 分別讀取 Path_current下面的cont與exp資料夾內的MARS結果資料夾，直接從各資料夾中讀取名稱為 Name_Rmapfile(Rmap_beswarrest.nii)的檔案
@@ -180,7 +191,7 @@ else:
         result_dir_new = join(result_dir,'rsn%d' % ii)
         safe_mkdir(result_dir_new)
         if args.mp:
-            p = multiprocessing.Process(target=processfile, args=(list_control_new, list_experim_new, args, result_dir_new))
+            p = mp.Process(target=processfile, args=(list_control_new, list_experim_new, args, result_dir_new))
             p.start()
         else:
             processfile(list_control_new, list_experim_new, args, result_dir_new)
