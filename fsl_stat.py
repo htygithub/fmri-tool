@@ -121,9 +121,9 @@ def processfile(list_control, list_experim, args, result_dir):
                   (all_rmap_ff, twosample_ff,design_mat_ff,
                    design_con_ff, N_iter, multiple_comp)
         systemx(str_OSins)
+        safe_remove(ctrl_rmap_ff)
+        safe_remove(exp_rmap_ff)
         if not args.keep:
-            safe_remove(ctrl_rmap_ff)
-            safe_remove(exp_rmap_ff)
             safe_remove(all_rmap_ff)
 
 
