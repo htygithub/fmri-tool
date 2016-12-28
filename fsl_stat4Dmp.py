@@ -10,6 +10,9 @@ import multiprocessing as mp
 import numpy as np
 import math
 import nibabel as nib
+from os.path import dirname,basename,splitext,join
+#def filehead(f):
+#    return join(dirname(f),basename(f).split('.')[0])
 
 
 def safe_mkdir(dirname):
@@ -42,15 +45,15 @@ def r_to_z(rmap_ff):
     return new_rmap_ff
 
 def processfile(list_control, list_experim, args, result_dir):
-    print('Control datafiles:')
+
     for ii in range(len(list_control)):
-        print('%d:%s' % (ii,list_control[ii]))
+        #print('%d:%s' % (ii,list_control[ii]))
         if args.zmap:
             list_control[ii] = r_to_z(list_control[ii])
 
-    print('Exp datafiles:')
+    #print('Exp datafiles:')
     for ii in range(len(list_experim)):
-        print('%d:%s' % (ii,list_experim[ii]))
+        #print('%d:%s' % (ii,list_experim[ii]))
         if args.zmap:
             list_experim[ii] = r_to_z(list_experim[ii])
 
@@ -118,9 +121,10 @@ def processfile(list_control, list_experim, args, result_dir):
                   (all_rmap_ff, twosample_ff,design_mat_ff,
                    design_con_ff, N_iter, multiple_comp)
         systemx(str_OSins)
-        safe_remove(ctrl_rmap_ff)
-        safe_remove(exp_rmap_ff)
-        safe_remove(all_rmap_ff)
+        if not args.keep:
+            safe_remove(ctrl_rmap_ff)
+            safe_remove(exp_rmap_ff)
+            safe_remove(all_rmap_ff)
 
 
 
@@ -134,6 +138,7 @@ parser.add_argument("-z", dest="zmap", help="Fisher's r-to-z transform (default:
 parser.add_argument("-mp", dest="mp", help="multiple cpu processing (default: none)",action='store_true')
 parser.add_argument("-nchc", dest="nchc", help="Run in NCHC (default: none)",action='store_true')
 parser.add_argument("-tfce", dest="tfce", help="FSL TFCE (default: none)",action='store_true')
+parser.add_argument("-keep", dest="keep", help="Keep temp Rmap (default: none)",action='store_true')
 args = parser.parse_args()
 
 #x=int(subprocess.check_output('. /etc/fsl/fsl.sh && fslnvols Rmap_beswarrest.nii',shell=True))
@@ -163,11 +168,12 @@ if args.nchc:
 else:
     nvols=int(subprocess.check_output('. /etc/fsl/fsl.sh && fslnvols %s' % list_control[0],shell=True))
 
-print(nvols)
-from os.path import dirname,basename,splitext,join
-def filehead(f):
-    return join(dirname(f),basename(f).split('.')[0])
 
+with open(join(result_dir,"processlog.txt"), "a") as myfile:
+    myfile.write("Cotrol files:\n")
+    myfile.write('\n'.join(list_control))
+    myfile.write("EXP files:\n")
+    myfile.write('\n'.join(list_experim))
 
 #processfile(list_control, list_experim, args, result_dir)
 if nvols == 1:
