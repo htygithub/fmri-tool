@@ -1,3 +1,4 @@
+#resample craddock 2012 to SPM affine
 import numpy as np
 
 from nilearn.image import resample_img

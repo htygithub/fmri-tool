@@ -170,9 +170,9 @@ else:
 
 
 with open(join(result_dir,"processlog.txt"), "a") as myfile:
-    myfile.write("Cotrol files:\n")
+    myfile.write("\nCotrol files:\n")
     myfile.write('\n'.join(list_control))
-    myfile.write("EXP files:\n")
+    myfile.write("\nEXP files:\n")
     myfile.write('\n'.join(list_experim))
 
 #processfile(list_control, list_experim, args, result_dir)
