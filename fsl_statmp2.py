@@ -139,7 +139,7 @@ parser.add_argument("-mp", dest="mp", help="multiple cpu processing (default: no
 parser.add_argument("-nchc", dest="nchc", help="Run in NCHC (default: none)",action='store_true')
 parser.add_argument("-tfce", dest="tfce", help="FSL TFCE (default: none)",action='store_true')
 parser.add_argument("-keep", dest="keep", help="Keep temp Rmap (default: none)",action='store_true')
-parser.add_argument("-rsns", dest="rsns", help="the RSN to process (default: all)", default="all",action='store', type='string')
+parser.add_argument("-rsns", dest="rsns", help="the RSN to process (default: all)", default="all",action='store')
 args = parser.parse_args()
 
 #x=int(subprocess.check_output('. /etc/fsl/fsl.sh && fslnvols Rmap_beswarrest.nii',shell=True))
