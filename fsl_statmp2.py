@@ -204,7 +204,7 @@ else:
         result_dir_new = join(result_dir,'rsn%d' % ii)
         safe_mkdir(result_dir_new)
         if args.mp:
-            pool.apply_async(target=processfile, args=(list_control_new, list_experim_new, args, result_dir_new))
+            pool.apply_async(processfile, (list_control_new, list_experim_new, args, result_dir_new))
             #p = mp.Process(target=processfile, args=(list_control_new, list_experim_new, args, result_dir_new))
             #p.start()
         else:
