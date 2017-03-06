@@ -139,6 +139,7 @@ parser.add_argument("-mp", dest="mp", help="multiple cpu processing (default: no
 parser.add_argument("-nchc", dest="nchc", help="Run in NCHC (default: none)",action='store_true')
 parser.add_argument("-tfce", dest="tfce", help="FSL TFCE (default: none)",action='store_true')
 parser.add_argument("-keep", dest="keep", help="Keep temp Rmap (default: none)",action='store_true')
+parser.add_argument("-rsns", dest="rsns", help="the RSN to process (default: all)", default="all",action='store', type='string')
 args = parser.parse_args()
 
 #x=int(subprocess.check_output('. /etc/fsl/fsl.sh && fslnvols Rmap_beswarrest.nii',shell=True))
@@ -181,7 +182,11 @@ if nvols == 1:
     processfile(list_control, list_experim, args, result_dir)
     exit()
 else:
-    for ii in range(nvols):
+    if args.rsns == 'all':
+        rsn_range = list(range(nvols))
+    else:
+        rsn_range = [int(ii) for ii in args.rsns.split(',')]
+    for ii in rsn_range:
 
         list_control_new=[]
         list_experim_new=[]
