@@ -178,7 +178,7 @@ else:
         list_control = [f for f in iglob(join(args.control_dir,'**',args.Name_Rmapfile),recursive=True)]
         list_experim = [f for f in iglob(join(args.exp_dir,'**',args.Name_Rmapfile),recursive=True)]
 
-
+print(list_control)
 if args.nchc:
     nvols=int(subprocess.check_output('fslnvols %s' % list_control[0],shell=True))
 else:
