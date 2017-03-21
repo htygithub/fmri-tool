@@ -157,9 +157,16 @@ if args.tfce:
 safe_mkdir(result_dir)
 if args.ctrl_txt is not 'none':
     with open(args.ctrl_txt, 'r') as f:
-        list_control = [line.strip() for line in f]
+        list_control_dirs = [line.strip() for line in f]
     with open(args.exp_txt, 'r') as f:
-        list_experim = [line.strip() for line in f]
+        list_experim_dirs = [line.strip() for line in f]
+    list_control = []
+    list_experim = []
+    for dd in list_control_dirs:
+        list_control.extend(iglob(join(dd,'**',args.Name_Rmapfile),recursive=True))
+    for dd in list_experim_dirs:
+        list_experim.extend(iglob(join(dd,'**',args.Name_Rmapfile),recursive=True))
+
 else:
     if args.allnii:
         # 分別讀取 Path_current下面的cont與exp資料夾內的MARS結果資料夾，直接從各資料夾中讀取名稱為 Name_Rmapfile(Rmap_beswarrest.nii)的檔案
