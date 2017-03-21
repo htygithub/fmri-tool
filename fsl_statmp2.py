@@ -140,6 +140,8 @@ parser.add_argument("-nchc", dest="nchc", help="Run in NCHC (default: none)",act
 parser.add_argument("-tfce", dest="tfce", help="FSL TFCE (default: none)",action='store_true')
 parser.add_argument("-keep", dest="keep", help="Keep temp Rmap (default: none)",action='store_true')
 parser.add_argument("-rsns", dest="rsns", help="the RSN to process (default: all)", default="all",action='store')
+parser.add_argument("-cl", dest="ctrl_txt", help="Path of control data (default: ctrl)",action='store',default='none')
+parser.add_argument("-el", dest="exp_txt", help="Path of experiement data (default: exp)",action='store',default='none')
 args = parser.parse_args()
 
 #x=int(subprocess.check_output('. /etc/fsl/fsl.sh && fslnvols Rmap_beswarrest.nii',shell=True))
@@ -153,15 +155,21 @@ result_dir = join(Path_current,datetime.datetime.now().strftime("S%m%d_%H%M%S_")
 if args.tfce:
     result_dir += '_tfce'
 safe_mkdir(result_dir)
-if args.allnii:
-    # 分別讀取 Path_current下面的cont與exp資料夾內的MARS結果資料夾，直接從各資料夾中讀取名稱為 Name_Rmapfile(Rmap_beswarrest.nii)的檔案
-    list_control = glob(join(args.control_dir,'*.nii'))
-    list_control.extend(glob(join(args.control_dir,'*.nii.gz')))
-    list_experim = glob(join(args.exp_dir,'*.nii'))
-    list_experim.extend(glob(join(args.exp_dir,'*.nii.gz')))
+if args.ctrl_txt is not 'none':
+    with open(args.ctrl_txt, 'r') as f:
+        list_control = [line.strip() for line in f]
+    with open(args.exp_txt, 'r') as f:
+        list_experim = [line.strip() for line in f]
 else:
-    list_control = [f for f in iglob(join(args.control_dir,'**',args.Name_Rmapfile),recursive=True)]
-    list_experim = [f for f in iglob(join(args.exp_dir,'**',args.Name_Rmapfile),recursive=True)]
+    if args.allnii:
+        # 分別讀取 Path_current下面的cont與exp資料夾內的MARS結果資料夾，直接從各資料夾中讀取名稱為 Name_Rmapfile(Rmap_beswarrest.nii)的檔案
+        list_control = glob(join(args.control_dir,'*.nii'))
+        list_control.extend(glob(join(args.control_dir,'*.nii.gz')))
+        list_experim = glob(join(args.exp_dir,'*.nii'))
+        list_experim.extend(glob(join(args.exp_dir,'*.nii.gz')))
+    else:
+        list_control = [f for f in iglob(join(args.control_dir,'**',args.Name_Rmapfile),recursive=True)]
+        list_experim = [f for f in iglob(join(args.exp_dir,'**',args.Name_Rmapfile),recursive=True)]
 
 
 if args.nchc:
