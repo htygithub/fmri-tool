@@ -177,6 +177,8 @@ else:
     else:
         list_control = [f for f in iglob(join(args.control_dir,'**',args.Name_Rmapfile),recursive=True)]
         list_experim = [f for f in iglob(join(args.exp_dir,'**',args.Name_Rmapfile),recursive=True)]
+    list_control.sort()
+    list_experim.sort()
 
 print(list_control)
 if args.nchc:
