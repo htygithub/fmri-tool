@@ -83,7 +83,7 @@ def processfile(list_control, list_experim, args, result_dir):
 
 
 parser = ArgumentParser()
-arser.add_argument("-f", dest="Name_Rmapfile", help="File name of Rmap, Default: Rmap_beswarrest.nii",action='store',default='Rmap_beswarrest.nii')
+parser.add_argument("-f", dest="Name_Rmapfile", help="File name of Rmap, Default: Rmap_beswarrest.nii",action='store',default='Rmap_beswarrest.nii')
 parser.add_argument("-l", dest="ctrl_txt", help="Path of data ",action='store',default='none')
 args = parser.parse_args()
 
