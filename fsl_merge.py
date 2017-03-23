@@ -91,7 +91,6 @@ args = parser.parse_args()
 
 #Path_current='/home/tyhuang/FACEmars'
 Path_current = os.getcwd()
-N_iter=args.N_iter
 #Name_Rmapfile='Rmap_beswarrest.nii'
 result_dir = join(Path_current,datetime.datetime.now().strftime("mergedata_S%m%d_%H%M%S_") + \
                   args.Name_Rmapfile.split('.')[0])
