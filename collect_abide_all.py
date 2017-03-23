@@ -20,15 +20,17 @@ tc = []
 alldata = []
 
 for ii in range(len(SUB_ID)):
+    found = False
     for f in files:
         if str(SUB_ID[ii]) in f:
             alldata.append(f)
+            found = True
             if DX_GROUP[ii] == 1:
                 asd.append(f)
             else:
                 tc.append(f)
-        else:
-            print('%s not found:' % str(SUB_ID[ii]))
+    if not found:
+        print('%s not found:' % str(SUB_ID[ii]))
 #for i in range(len(data)):
 #    shutil.copy(data[i], 'Z:\\Exp_Data\\105_Lynn\\abide_marsmat\\gooddata\\')
 with open('asdlist.txt', 'w') as outfile:
