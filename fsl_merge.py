@@ -104,10 +104,7 @@ if args.ctrl_txt is not 'none':
 
 
 print(list_control)
-if args.nchc:
-    nvols=int(subprocess.check_output('fslnvols %s' % list_control[0],shell=True))
-else:
-    nvols=int(subprocess.check_output('. /etc/fsl/fsl.sh && fslnvols %s' % list_control[0],shell=True))
+nvols=int(subprocess.check_output('. /etc/fsl/fsl.sh && fslnvols %s' % list_control[0],shell=True))
 
 
 with open(join(result_dir,"processlog.txt"), "a") as myfile:
