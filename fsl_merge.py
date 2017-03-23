@@ -44,40 +44,25 @@ def r_to_z(rmap_ff):
     nib.save(new_image,new_rmap_ff)
     return new_rmap_ff
 
-def processfile(list_control, list_experim, args, result_dir):
+def processfile(list_control,  args, result_dir):
 
     for ii in range(len(list_control)):
         #print('%d:%s' % (ii,list_control[ii]))
         if args.zmap:
             list_control[ii] = r_to_z(list_control[ii])
 
-    #print('Exp datafiles:')
-    for ii in range(len(list_experim)):
-        #print('%d:%s' % (ii,list_experim[ii]))
-        if args.zmap:
-            list_experim[ii] = r_to_z(list_experim[ii])
 
 
-    ctrl_rmap_ff = join(result_dir,'ctrlRmaps.nii.gz')
-    exp_rmap_ff = join(result_dir,'expRmaps.nii.gz')
+
     all_rmap_ff = join(result_dir,'allRmaps.nii.gz')
-    ctrl_1sample_ff = join(result_dir,'ctrl_1sample')
-    exp_1sample_ff = join(result_dir,'exp_1sample')
-    twosample_ff = join(result_dir,'twosample')
-    design_ff = join(result_dir,'design')
-    design_mat_ff = join(result_dir,'design.mat')
-    design_con_ff = join(result_dir,'design.con')
 
-    if args.tfce:
-        multiple_comp = '-T'
-    else:
-        multiple_comp = '-x'
+
 
     # 列出control內所有的影像路徑
     if len(list_control) > 0:
         str_control = ' '.join(list_control)
         # 把所有control受試者的Rmap合併成一個四維的Rmaps
-        str_OSins='fslmerge -t %s %s ' % (ctrl_rmap_ff,str_control)
+        str_OSins='fslmerge -t %s %s ' % (all_rmap_ff, str_control)
         systemx(str_OSins)
 
 
@@ -111,13 +96,11 @@ nvols=int(subprocess.check_output('. /etc/fsl/fsl.sh && fslnvols %s' % list_cont
 with open(join(result_dir,"processlog.txt"), "a") as myfile:
     myfile.write("\nCotrol files:\n")
     myfile.write('\n'.join(list_control))
-    myfile.write("\nEXP files:\n")
-    myfile.write('\n'.join(list_experim))
 
 #processfile(list_control, list_experim, args, result_dir)
 if nvols == 1:
     #3D simple
-    processfile(list_control, list_experim, args, result_dir)
+    processfile(list_control, args, result_dir)
     exit()
 else:
     for ii in list(range(nvols)):
@@ -131,4 +114,4 @@ else:
 
         result_dir_new = join(result_dir,'rsn%d' % ii)
         safe_mkdir(result_dir_new)
-        processfile(list_control_new, list_experim_new, args, result_dir_new)
+        processfile(list_control_new, args, result_dir_new)
