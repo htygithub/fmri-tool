@@ -94,6 +94,7 @@ Path_current = os.getcwd()
 #Name_Rmapfile='Rmap_beswarrest.nii'
 result_dir = join(Path_current,datetime.datetime.now().strftime("mergedata_S%m%d_%H%M%S_") + \
                   args.Name_Rmapfile.split('.')[0])
+safe_mkdir(result_dir)
 
 if args.ctrl_txt is not 'none':
     with open(args.ctrl_txt, 'r') as f:
