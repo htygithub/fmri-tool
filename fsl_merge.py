@@ -46,18 +46,8 @@ def r_to_z(rmap_ff):
 
 def processfile(list_control,  args, result_dir):
 
-    for ii in range(len(list_control)):
-        #print('%d:%s' % (ii,list_control[ii]))
-        if args.zmap:
-            list_control[ii] = r_to_z(list_control[ii])
-
-
-
 
     all_rmap_ff = join(result_dir,'allRmaps.nii.gz')
-
-
-
     # 列出control內所有的影像路徑
     if len(list_control) > 0:
         str_control = ' '.join(list_control)
