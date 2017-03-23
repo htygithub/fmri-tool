@@ -54,6 +54,8 @@ def processfile(list_control,  args, result_dir):
         # 把所有control受試者的Rmap合併成一個四維的Rmaps
         str_OSins='fslmerge -t %s %s ' % (all_rmap_ff, str_control)
         systemx(str_OSins)
+        for f in list_control:
+            safe_remove(f)
 
 
 
