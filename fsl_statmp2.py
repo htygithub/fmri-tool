@@ -195,6 +195,7 @@ with open(join(result_dir,"processlog.txt"), "a") as myfile:
 
 with open(join(result_dir,"subjdx.txt"), "a") as myfile:
     myfile.write('\n'.join(['0']*len(list_control)))
+    myfile.write('\n')
     myfile.write('\n'.join(['1']*len(list_experim)))
 
 #processfile(list_control, list_experim, args, result_dir)
