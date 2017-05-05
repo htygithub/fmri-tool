@@ -4,8 +4,8 @@ import glob
 import numpy as np
 import shutil
 #matfile = loadmat('abide_mars2_0050002_3726')
-v1 = pd.read_csv(r'Phenotypic_V1_0b_preprocessed1.csv')
-v2 = pd.read_csv(r'ABIDEII_Composite_Phenotypic.csv')
+v1 = pd.read_csv(r'Phenotypic_V1_0b_preprocessed1.csv',encoding = 'iso-8859-1')
+v2 = pd.read_csv(r'ABIDEII_Composite_Phenotypic.csv',encoding = 'iso-8859-1')
 #v2=v1[(v1.qc_rater_1 != 'fail') & (v1.qc_anat_rater_2 != 'fail') & \
 #      (v1.qc_func_rater_2 != 'fail') & (v1.qc_func_rater_3 != 'fail')]
 #data=v2.as_matrix()
