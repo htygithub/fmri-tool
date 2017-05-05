@@ -11,10 +11,8 @@ v2 = pd.read_csv(r'ABIDEII_Composite_Phenotypic.csv',encoding = 'iso-8859-1')
 #data=v2.as_matrix()
 #v2 = v1[v1.SRS_RAW_TOTAL>0]
 files = glob.glob(r'*')
-SUB_ID = v1.SUB_ID + v2.SUB_ID
-DX_GROUP = v1.DX_GROUP + v2.DX_GROUP
-SUB_ID = SUB_ID.tolist()
-DX_GROUP = DX_GROUP.tolist()
+SUB_ID = v1.SUB_ID.tolist() + v2.SUB_ID.tolist()
+DX_GROUP = v1.DX_GROUP.tolist() + v2.DX_GROUP.tolist()
 asd = []
 tc = []
 
