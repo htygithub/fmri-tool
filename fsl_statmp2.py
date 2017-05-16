@@ -85,7 +85,8 @@ def processfile(list_control, list_experim, args, result_dir):
         # 做出control的One sample t-test結果
         str_OSins='randomise -i %s -o %s -1  -n %d --quiet %s' % \
                   (ctrl_rmap_ff, ctrl_1sample_ff, N_iter, multiple_comp)
-        systemx(str_OSins)
+        if not args.merge:
+            systemx(str_OSins)
 
 
     # 列出Expriment內所有的影像路徑
@@ -100,7 +101,8 @@ def processfile(list_control, list_experim, args, result_dir):
         # 做出Expriment的One sample t-test結果
         str_OSins='randomise -i %s -o %s -1  -n %d --quiet %s' % \
                   (exp_rmap_ff, exp_1sample_ff, N_iter, multiple_comp)
-        systemx(str_OSins)
+        if not args.merge:
+            systemx(str_OSins)
 
 
 
@@ -120,10 +122,11 @@ def processfile(list_control, list_experim, args, result_dir):
         str_OSins='randomise -i %s -o %s -d %s -t %s -n %d --quiet %s' % \
                   (all_rmap_ff, twosample_ff,design_mat_ff,
                    design_con_ff, N_iter, multiple_comp)
-        systemx(str_OSins)
+        if not args.merge:
+            systemx(str_OSins)
         safe_remove(ctrl_rmap_ff)
         safe_remove(exp_rmap_ff)
-        if not args.keep:
+        if (not args.keep) and (not args.merge):
             safe_remove(all_rmap_ff)
 
 
@@ -142,6 +145,7 @@ parser.add_argument("-keep", dest="keep", help="Keep temp Rmap (default: none)",
 parser.add_argument("-rsns", dest="rsns", help="the RSN to process (default: all)", default="all",action='store')
 parser.add_argument("-cl", dest="ctrl_txt", help="Path of control data (default: ctrl)",action='store',default='none')
 parser.add_argument("-el", dest="exp_txt", help="Path of experiement data (default: exp)",action='store',default='none')
+parser.add_argument("-merge", dest="merge", help="Merge only (default: none)",action='store_true')
 args = parser.parse_args()
 
 #x=int(subprocess.check_output('. /etc/fsl/fsl.sh && fslnvols Rmap_beswarrest.nii',shell=True))
