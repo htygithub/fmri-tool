@@ -148,6 +148,7 @@ parser.add_argument("-rsns", dest="rsns", help="the RSN to process (default: all
 parser.add_argument("-cl", dest="ctrl_txt", help="Path of control data (default: ctrl)",action='store',default='none')
 parser.add_argument("-el", dest="exp_txt", help="Path of experiement data (default: exp)",action='store',default='none')
 parser.add_argument("-merge", dest="merge", help="Merge only (default: none)",action='store_true')
+parser.add_argument("-rsn10drz", dest="rsn10drz", help="rsn10drz",action='store_true')
 args = parser.parse_args()
 
 #x=int(subprocess.check_output('. /etc/fsl/fsl.sh && fslnvols Rmap_beswarrest.nii',shell=True))
@@ -168,10 +169,14 @@ if args.ctrl_txt is not 'none':
         list_experim_dirs = [line.strip() for line in f]
     list_control = []
     list_experim = []
-    for dd in list_control_dirs:
-        list_control.extend(iglob(join(dd,'**',args.Name_Rmapfile),recursive=True))
-    for dd in list_experim_dirs:
-        list_experim.extend(iglob(join(dd,'**',args.Name_Rmapfile),recursive=True))
+    if rsn10drz:
+        list_control = list_control_dirs
+        list_experim = list_experim_dirs
+    else:
+        for dd in list_control_dirs:
+            list_control.extend(iglob(join(dd,'**',args.Name_Rmapfile),recursive=True))
+        for dd in list_experim_dirs:
+            list_experim.extend(iglob(join(dd,'**',args.Name_Rmapfile),recursive=True))
 
 else:
     if args.allnii:
@@ -192,7 +197,7 @@ if args.nchc:
 else:
     nvols=int(subprocess.check_output('. /etc/fsl/fsl.sh && fslnvols %s' % list_control[0],shell=True))
 
-pool = mp.Pool(processes=2)
+pool = mp.Pool(processes=4)
 with open(join(result_dir,"processlog.txt"), "a") as myfile:
     myfile.write("\nCotrol files:\n")
     myfile.write('\n'.join(list_control))
