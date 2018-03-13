@@ -169,7 +169,7 @@ if args.ctrl_txt is not 'none':
         list_experim_dirs = [line.strip() for line in f]
     list_control = []
     list_experim = []
-    if rsn10drz:
+    if args.rsn10drz:
         list_control = list_control_dirs
         list_experim = list_experim_dirs
     else:
